@@ -2,7 +2,7 @@ use std::{fs, io, path};
 
 use crate::{fs::metadata::JoshutoMetadata, types::option::display::DisplayOption};
 
-use super::FileType;
+use super::{FileType, GitFileStatus};
 
 #[derive(Clone, Debug)]
 pub struct JoshutoDirEntry {
@@ -10,6 +10,8 @@ pub struct JoshutoDirEntry {
     pub ext: Option<String>,
     pub path: path::PathBuf,
     pub metadata: JoshutoMetadata,
+    /// Git status of this entry, or `None` outside a repo / when disabled
+    git_status: Option<GitFileStatus>,
     /// Directly selected by the user, _not_ by a current visual mode selection
     permanent_selected: bool,
     /// Temporarily selected by the visual mode range
@@ -51,10 +53,19 @@ impl JoshutoDirEntry {
             ext,
             path,
             metadata,
+            git_status: None,
             permanent_selected: false,
             visual_mode_selected: false,
             _marked: false,
         })
+    }
+
+    pub fn git_status(&self) -> Option<GitFileStatus> {
+        self.git_status
+    }
+
+    pub fn set_git_status(&mut self, git_status: Option<GitFileStatus>) {
+        self.git_status = git_status;
     }
 
     pub fn file_name(&self) -> &str {

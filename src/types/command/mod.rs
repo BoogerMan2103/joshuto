@@ -159,6 +159,7 @@ pub enum Command {
     SignalSuspend,
 
     ToggleHiddenFiles,
+    ToggleGitStatus,
     SwitchLineNums(LineNumberStyle),
 
     Flat {

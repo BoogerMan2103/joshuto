@@ -184,6 +184,7 @@ impl AppExecute for Command {
             }
 
             Self::ToggleHiddenFiles => show_hidden::toggle_hidden(app_state),
+            Self::ToggleGitStatus => show_git_status::toggle_git_status(app_state),
 
             Self::TabSwitch { offset } => {
                 tab_ops::tab_switch(app_state, *offset).map_err(|e| e.into())

@@ -47,6 +47,15 @@ pub fn create_dirlist_with_history(
     let filter_func = options.filter_func();
     let mut contents = read_directory(path, filter_func, options, tab_options)?;
 
+    // attach git status indicators
+    if options.show_git_status {
+        if let Some(statuses) = crate::fs::dir_git_statuses(path) {
+            for entry in contents.iter_mut() {
+                entry.set_git_status(statuses.get(entry.file_name()).copied());
+            }
+        }
+    }
+
     // re-use directory size information on reload
     for entry in contents.iter_mut() {
         if entry.metadata.is_dir() {

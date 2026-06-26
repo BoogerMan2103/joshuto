@@ -31,6 +31,10 @@ pub struct AppTheme {
     pub link: AppStyle,
     pub link_invalid: AppStyle,
     pub socket: AppStyle,
+    pub git_modified: AppStyle,
+    pub git_staged: AppStyle,
+    pub git_untracked: AppStyle,
+    pub git_deleted: AppStyle,
     pub ext: HashMap<String, AppStyle>,
     pub lscolors: Option<LsColors>,
     pub preview_background: Color,
@@ -70,6 +74,10 @@ impl From<AppThemeRaw> for AppTheme {
         let link = raw.link.to_style_theme();
         let link_invalid = raw.link_invalid.to_style_theme();
         let socket = raw.socket.to_style_theme();
+        let git_modified = raw.git_modified.to_style_theme();
+        let git_staged = raw.git_staged.to_style_theme();
+        let git_untracked = raw.git_untracked.to_style_theme();
+        let git_deleted = raw.git_deleted.to_style_theme();
         let ext: HashMap<String, AppStyle> = raw
             .ext
             .iter()
@@ -96,6 +104,10 @@ impl From<AppThemeRaw> for AppTheme {
             link,
             link_invalid,
             socket,
+            git_modified,
+            git_staged,
+            git_untracked,
+            git_deleted,
             ext,
             tabs: TabTheme::from(tabs),
             lscolors,

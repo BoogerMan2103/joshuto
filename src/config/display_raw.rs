@@ -25,6 +25,8 @@ pub struct DisplayOptionRaw {
     pub show_hidden: bool,
     #[serde(default)]
     pub show_icons: bool,
+    #[serde(default)]
+    pub show_git_status: bool,
     #[serde(default, rename = "sort")]
     pub sort_options: SortOptionRaw,
     #[serde(default)]
@@ -44,6 +46,7 @@ impl std::default::Default for DisplayOptionRaw {
             show_borders: true,
             show_hidden: false,
             show_icons: false,
+            show_git_status: false,
             sort_options: SortOptionRaw::default(),
             line_number_style: LineNumberStyle::default(),
             linemode: LineMode::default(),

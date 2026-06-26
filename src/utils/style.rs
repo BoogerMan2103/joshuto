@@ -4,7 +4,7 @@ use ratatui::style::Style;
 use std::path::Path;
 
 use crate::config::app::AppConfig;
-use crate::fs::{FileType, JoshutoDirEntry, LinkType};
+use crate::fs::{FileType, GitFileStatus, JoshutoDirEntry, LinkType};
 use crate::utils::unix;
 
 use crate::THEME_T;
@@ -46,6 +46,23 @@ pub fn entry_style(config: &AppConfig, entry: &JoshutoDirEntry) -> Style {
         }
         None => default_style(config, entry, linktype, filetype),
     }
+}
+
+/// Style for a `git status --short` indicator, chosen by the kind of change.
+pub fn git_status_style(status: GitFileStatus) -> Style {
+    let theme = if status.is_untracked() {
+        &THEME_T.git_untracked
+    } else if status.is_deleted() {
+        &THEME_T.git_deleted
+    } else if status.is_staged_only() {
+        &THEME_T.git_staged
+    } else {
+        &THEME_T.git_modified
+    };
+    Style::default()
+        .fg(theme.fg)
+        .bg(theme.bg)
+        .add_modifier(theme.modifier)
 }
 
 pub fn entry_prefix(entry: &JoshutoDirEntry) -> &str {
