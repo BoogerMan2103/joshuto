@@ -23,6 +23,8 @@ use uuid::Uuid;
 use ratatui::layout::Rect;
 use ratatui::termion::event::Event;
 
+/// joshuto's main loop: opens the initial tab, then repeatedly renders the UI, waits for the
+/// next event, and dispatches it, until a quit command sets `app_state.quit`.
 pub fn run_loop(
     backend: &mut ui::AppBackend,
     app_state: &mut AppState,
@@ -187,7 +189,7 @@ fn process_input(
 fn calculate_ui_state(app_state: &mut AppState, area: Rect) {
     let area = Rect {
         y: area.top() + 1,
-        height: area.height - 2,
+        height: area.height.saturating_sub(2),
         ..area
     };
     let display_options = &app_state.config.display_options;

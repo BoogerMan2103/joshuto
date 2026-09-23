@@ -5,6 +5,8 @@ use crate::preview::preview_dir;
 use crate::types::state::AppState;
 use crate::ui::AppBackend;
 
+/// Loads a preview for the entry currently under the cursor (or the current directory, if
+/// empty) in the active tab.
 pub fn load_previews(app_state: &mut AppState, backend: &mut AppBackend) {
     let mut load_list = Vec::with_capacity(2);
 
@@ -28,6 +30,8 @@ pub fn load_previews(app_state: &mut AppState, backend: &mut AppBackend) {
     }
 }
 
+/// Loads a preview for `p`: kicks off a background directory read if it's a directory not
+/// already loading or cached, or loads a file preview if it's under the configured size limit.
 pub fn load_preview_path(
     app_state: &mut AppState,
     backend: &mut AppBackend,
@@ -39,11 +43,7 @@ pub fn load_preview_path(
         let tab = app_state.state.tab_state_ref().curr_tab_ref();
         // only load if there doesn't already exist a loading thread and
         // there isn't an entry in history
-        let need_to_load = tab
-            .history_metadata_ref()
-            .get(p.as_path())
-            .map(|m| m.is_loading())
-            .unwrap_or(true)
+        let need_to_load = tab.history_metadata_ref().get(p.as_path()).is_none()
             && tab
                 .history_ref()
                 .get(p.as_path())

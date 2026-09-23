@@ -5,6 +5,8 @@ use crate::ui::AppBackend;
 use super::fzf;
 use super::select::SelectOption;
 
+/// Implements `select_fzf`: opens a multi-select fzf picker over the current directory's
+/// entries and applies the selection (or deselection/toggle, per `options`).
 pub fn select_fzf(
     app_state: &mut AppState,
     backend: &mut AppBackend,
@@ -44,8 +46,11 @@ pub fn select_fzf(
 
         for selected in fzf_output.lines() {
             if let Some((selected_idx_str, _)) = selected.split_once(' ') {
-                if let Ok(index) = selected_idx_str.parse::<usize>() {
-                    let entry = curr_list.contents.get_mut(index).unwrap();
+                if let Some(entry) = selected_idx_str
+                    .parse::<usize>()
+                    .ok()
+                    .and_then(|index| curr_list.contents.get_mut(index))
+                {
                     found += 1;
 
                     if options.reverse {

@@ -10,12 +10,15 @@ use crate::utils::format;
 use crate::utils::unix;
 use crate::{THEME_T, TIMEZONE_STR};
 
+/// The bottom status line: current entry's permissions, owner, group, position, mtime, size,
+/// active flat/filter indicators, and selection count.
 pub struct TuiFooter<'a> {
     dirlist: &'a JoshutoDirList,
     tab_options: &'a TabDisplayOption,
 }
 
 impl<'a> TuiFooter<'a> {
+    /// Creates the footer widget for the given directory listing and tab options.
     pub fn new(dirlist: &'a JoshutoDirList, tab_options: &'a TabDisplayOption) -> Self {
         Self {
             dirlist,
@@ -84,14 +87,14 @@ impl Widget for TuiFooter<'_> {
                     Span::raw(size_str),
                     Span::raw("  "),
                     Span::styled(
-                        match self.tab_options.dirlist_options_ref(&path.to_path_buf()) {
+                        match self.tab_options.dirlist_options_ref(path) {
                             Some(opt) if opt.depth() > 0 => format!("flat:{} ", opt.depth()),
                             _ => "".to_owned(),
                         },
                         indicator_style,
                     ),
                     Span::styled(
-                        match self.tab_options.dirlist_options_ref(&path.to_path_buf()) {
+                        match self.tab_options.dirlist_options_ref(path) {
                             Some(opt) if !opt.filter_state_ref().is_none() => {
                                 format!("filter:{} ", opt.filter_state_ref())
                             }

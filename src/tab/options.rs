@@ -1,4 +1,5 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 
 use crate::fs::DirListDisplayOptions;
 use crate::types::option::line_mode::LineMode;
@@ -13,18 +14,22 @@ pub struct TabDisplayOption {
 }
 
 impl TabDisplayOption {
+    /// Returns the current sort options for this tab.
     pub fn sort_options_ref(&self) -> &SortOption {
         &self.sort_options
     }
 
+    /// Returns a mutable reference to this tab's sort options.
     pub fn sort_options_mut(&mut self) -> &mut SortOption {
         &mut self.sort_options
     }
 
-    pub fn dirlist_options_ref(&self, path: &PathBuf) -> Option<&DirListDisplayOptions> {
+    /// Returns the per-directory display options for `path`, if set.
+    pub fn dirlist_options_ref(&self, path: &Path) -> Option<&DirListDisplayOptions> {
         self.dirlist_options.get(path)
     }
 
+    /// Returns a mutable reference to `path`'s display options, inserting the default if unset.
     pub fn dirlist_options_mut(&mut self, path: &PathBuf) -> &mut DirListDisplayOptions {
         if !self.dirlist_options.contains_key(path) {
             self.dirlist_options

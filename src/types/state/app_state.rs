@@ -17,6 +17,7 @@ use crate::{Args, THEME_T};
 
 use super::{FileManagerState, ThreadPool};
 
+/// The top-level application state: config, the event loop, CLI args, and all file-manager state.
 pub struct AppState {
     pub config: AppConfig,
     pub quit: QuitAction,
@@ -28,21 +29,21 @@ pub struct AppState {
 }
 
 impl AppState {
+    /// Builds the initial application state: sets up the event loop, filesystem watcher, image
+    /// preview picker, and XDG thumbnailer according to `config`.
     pub fn new(config: AppConfig, args: Args) -> Self {
         let picker = if config.preview_options.preview_shown_hook_script.is_none() {
-            Picker::from_termios().ok().and_then(|mut picker| {
-                picker.background_color = match THEME_T.preview_background {
-                    Color::Rgb(r, g, b) => Some(image::Rgb([r, g, b])),
+            Picker::from_query_stdio().ok().and_then(|mut picker| {
+                let bg = match THEME_T.preview_background {
+                    Color::Rgb(r, g, b) => Some(image::Rgba([r, g, b, 255])),
                     _ => None,
                 };
+                picker.set_background_color(bg);
                 match config.preview_options.preview_protocol {
-                    PreviewProtocol::Auto => {
-                        picker.guess_protocol(); // Must run before Events::new() because it makes ioctl calls.
-                        Some(picker)
-                    }
                     PreviewProtocol::Disabled => None,
+                    PreviewProtocol::Auto => Some(picker),
                     PreviewProtocol::ProtocolType(protocol_type) => {
-                        picker.protocol_type = protocol_type;
+                        picker.set_protocol_type(protocol_type);
                         Some(picker)
                     }
                 }
@@ -57,12 +58,19 @@ impl AppState {
         let commandline_state = CommandLineState::new();
 
         let event_tx_for_fs_notification = event_tx.clone();
+        let mut message_queue = MessageQueue::new();
+        // e.g. inotify instance limit reached; carry on without live updates
         let watcher = notify::recommended_watcher(move |res| {
             if let Ok(event) = res {
                 let _ = event_tx_for_fs_notification.send(AppEvent::Filesystem(event));
             }
         })
-        .unwrap();
+        .inspect_err(|e| {
+            message_queue.push_error(format!(
+                "Failed to start filesystem watcher, directories won't update automatically: {e}"
+            ))
+        })
+        .ok();
         let watched_paths = HashSet::with_capacity(3);
 
         let preview_script = config.preview_options.preview_script.clone();
@@ -82,7 +90,7 @@ impl AppState {
                 tab_state: TabState::new(),
                 local_state: None,
                 search_state: None,
-                message_queue: MessageQueue::new(),
+                message_queue,
                 worker_state: WorkerState::new(event_tx.clone()),
                 thread_pool: ThreadPool::new(),
                 preview_state: PreviewState::new(
@@ -102,12 +110,15 @@ impl AppState {
     }
 
     // event related
+    /// Blocks until the next application event arrives.
     pub fn poll_event(&self) -> Result<AppEvent, mpsc::RecvError> {
         self.events.next()
     }
+    /// Signals the input thread to poll for the next terminal input event.
     pub fn flush_event(&self) {
         self.events.flush();
     }
+    /// Returns a cloned sender for posting events onto the app event channel.
     pub fn clone_event_tx(&self) -> mpsc::Sender<AppEvent> {
         self.events.event_tx.clone()
     }

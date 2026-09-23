@@ -8,6 +8,8 @@ use crate::{
 
 use super::line_mode::LineNumberStyle;
 
+/// The overall UI layout: the standard multi-pane view, a minimal single-pane view, or a
+/// horizontally-split view.
 #[derive(Clone, Copy, Debug)]
 pub enum DisplayMode {
     Default,
@@ -15,6 +17,7 @@ pub enum DisplayMode {
     HSplit,
 }
 
+/// Returns the default parent/current/preview column width ratio.
 pub const fn default_column_ratio() -> (usize, usize, usize) {
     (1, 3, 4)
 }
@@ -27,6 +30,7 @@ pub struct DisplayOption {
     pub collapse_preview: bool,
     pub scroll_offset: usize,
     pub show_borders: bool,
+    pub show_hostname: bool,
     pub show_hidden: bool,
     pub show_icons: bool,
     pub line_number_style: LineNumberStyle,
@@ -68,6 +72,7 @@ impl From<DisplayOptionRaw> for DisplayOption {
             collapse_preview: raw.collapse_preview,
             scroll_offset: raw.scroll_offset,
             show_borders: raw.show_borders,
+            show_hostname: raw.show_hostname,
             show_hidden: raw.show_hidden,
             show_icons: raw.show_icons,
             line_number_style: raw.line_number_style,
@@ -85,6 +90,8 @@ impl From<DisplayOptionRaw> for DisplayOption {
 }
 
 impl DisplayOption {
+    /// Returns the function used to decide whether a directory entry should be shown, based on
+    /// hidden-file and filter/search settings.
     pub fn filter_func(
         &self,
     ) -> fn(&walkdir::DirEntry, &DisplayOption, &DirListDisplayOptions) -> bool {
@@ -114,6 +121,7 @@ impl std::default::Default for DisplayOption {
             collapse_preview: true,
             scroll_offset: 4,
             show_borders: true,
+            show_hostname: true,
             show_hidden: false,
             show_icons: false,
             line_number_style: LineNumberStyle::None,
