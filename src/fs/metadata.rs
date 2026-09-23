@@ -150,22 +150,13 @@ impl JoshutoMetadata {
     pub fn cumulative_size(&self) -> Option<u64> {
         self.cumulative_size
     }
-    pub fn cumulative_size(&self) -> Option<u64> {
-        self.cumulative_size
-    }
 
     /// Records the total recursive size of this directory in bytes.
     pub fn update_cumulative_size(&mut self, size: u64) {
         self.cumulative_size = Some(size);
     }
-    pub fn update_cumulative_size(&mut self, size: u64) {
-        self.cumulative_size = Some(size);
-    }
 
     /// Returns the entry's last-modified time.
-    pub fn modified(&self) -> time::SystemTime {
-        self.modified
-    }
     pub fn modified(&self) -> time::SystemTime {
         self.modified
     }
