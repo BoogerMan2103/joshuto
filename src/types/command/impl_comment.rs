@@ -110,6 +110,7 @@ impl CommandComment for Command {
             Self::SignalSuspend => "Suspend the current session",
 
             Self::ToggleHiddenFiles => "Toggle hidden files displaying",
+            Self::ToggleGitStatus => "Toggle git status indicators",
 
             Self::SwitchLineNums(_) => "Switch line numbering",
 

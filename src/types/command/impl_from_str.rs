@@ -106,6 +106,7 @@ impl std::str::FromStr for Command {
         simple_command_conversion_case!(command, CMD_SHOW_TASKS, Self::ShowTasks);
         simple_command_conversion_case!(command, CMD_SET_MODE, Self::SetMode);
         simple_command_conversion_case!(command, CMD_TOGGLE_HIDDEN, Self::ToggleHiddenFiles);
+        simple_command_conversion_case!(command, CMD_TOGGLE_GIT_STATUS, Self::ToggleGitStatus);
         simple_command_conversion_case!(command, CMD_BULK_RENAME, Self::BulkRename);
 
         simple_command_conversion_case!(command, CMD_SEARCH_FZF, Self::SearchFzf);
